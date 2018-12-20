@@ -1,0 +1,12 @@
+server:
+  port: 8763
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: admin
+    url: jdbc:mysql://192.168.197.15:3306/newdatadev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&
+
+mybatis:
+   mapperLocations: classpath:/mapper/*.xml

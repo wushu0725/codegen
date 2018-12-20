@@ -1,0 +1,8 @@
+com\codegen\util\StringUtils.class
+com\codegen\main\CodeGeneratorMain.class
+com\codegen\service\CodeGeneratorManager.class
+com\codegen\service\impl\ControllerGenerator.class
+com\codegen\service\impl\ModelAndMapperGenerator.class
+com\codegen\service\CodeGeneratorConfig.class
+com\codegen\service\CodeGenerator.class
+com\codegen\service\impl\ServiceGenerator.class
