@@ -1,4 +1,4 @@
-package ${package}.dao;
+package ${package}.${tableName}.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.heeexy.example.util.CommonUtil;

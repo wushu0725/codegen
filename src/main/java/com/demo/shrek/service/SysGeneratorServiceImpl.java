@@ -43,8 +43,6 @@ public class SysGeneratorServiceImpl implements SysGeneratorService{
 
         System.out.println(clomes.size());
 
-
-
         IOUtils.closeQuietly(zip);
         return outputStream.toByteArray();
     }

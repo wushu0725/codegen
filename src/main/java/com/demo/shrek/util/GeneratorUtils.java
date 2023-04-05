@@ -35,6 +35,8 @@ public class GeneratorUtils {
         templates.add("template/mapper.xml.vm");
         templates.add("template/service.java.vm");
         templates.add("template/serviceimpl.java.vm");
+        templates.add("template/pom.xml.vm");
+        templates.add("template/application.properties.vm");
         //templates.add("template/entity.java.vm");
         templates.add("template/dao.java.vm");
         templates.add("template/controller.java.vm");
@@ -108,6 +110,11 @@ public class GeneratorUtils {
         map.put("email", config.getString("email"));
         map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_TIME_PATTERN));
         map.put("moduleName", config.getString("mainModule"));
+        map.put("dbName", config.getString("dbName"));
+        map.put("username", config.getString("username"));
+        map.put("password", config.getString("password"));
+        map.put("project", config.getString("project"));
+        map.put("port", config.getString("port"));
         map.put("secondModuleName", toLowerCaseFirstOne(className));
         VelocityContext context = new VelocityContext(map);
 
@@ -121,7 +128,7 @@ public class GeneratorUtils {
 
             try {
                 //添加到zip
-                zip.putNextEntry(new ZipEntry(getFileName(template, tableEntity.getClassName(), config.getString("package"), config.getString("mainModule"))));
+                zip.putNextEntry(new ZipEntry(getFileName(tableEntity.getTableName(), template, config.getString("project"), tableEntity.getClassName(), config.getString("package"), config.getString("mainModule"))));
                 IOUtils.write(sw.toString(), zip, "UTF-8");
                 IOUtils.closeQuietly(sw);
                 zip.closeEntry();
@@ -163,11 +170,11 @@ public class GeneratorUtils {
     /**
      * 获取文件名
      */
-    public static String getFileName(String template, String className, String packageName, String moduleName) {
-        String packagePath = "main" + File.separator + "java" + File.separator;
+    public static String getFileName(String tableName, String template, String projectName, String className, String packageName, String moduleName) {
+        String packagePath = projectName + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
         String frontPath = "ui" + File.separator;
         if (StringUtils.isNotBlank(packageName)) {
-            packagePath += packageName.replace(".", File.separator) + File.separator;
+            packagePath += packageName.replace(".", File.separator) + File.separator + tableName + File.separator;
         }
 
         if (template.contains("index.js.vm")) {
@@ -183,20 +190,26 @@ public class GeneratorUtils {
         }
 
         if (template.contains("serviceimpl.java.vm")) {
-            return packagePath + "service" + File.separator +"impl"+File.separator+ className + "ServiceImpl.java";
+            return packagePath + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
         }
 
         if (template.contains("dao.java.vm")) {
-            return packagePath + "dao" + File.separator +"mysql"+File.separator+ className + "Dao.java";
+            return packagePath + "dao" + File.separator + className + "Dao.java";
         }
-//        if (template.contains("entity.java.vm")) {
-//            return packagePath + "entity" + File.separator + className + ".java";
-//        }
+
         if (template.contains("controller.java.vm")) {
             return packagePath + "controller" + File.separator + className + "Controller.java";
         }
         if (template.contains("mapper.xml.vm")) {
-            return "main" + File.separator + "resources" + File.separator + "mapper" + File.separator + className + "Mapper.xml";
+            return projectName + File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + "resources" + File.separator + "mapper" + File.separator + className + "Mapper.xml";
+        }
+
+        if (template.contains("application.properties.vm")) {
+            return projectName + File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + "resources" + File.separator + "application.properties";
+        }
+
+        if (template.contains("pom.xml.vm")) {
+            return projectName + File.separator + "pom.xml";
         }
 
         return null;

@@ -1,9 +1,9 @@
-package ${package}.service.impl;
+package ${package}.${tableName}.service.impl;
 
 
-import ${package}.dao.mysql.${className}Dao;
+import ${package}.${tableName}.dao.mysql.${className}Dao;
 import com.alibaba.fastjson.JSONObject;
-import ${package}.service.${className}Service;
+import ${package}.${tableName}.service.${className}Service;
 import com.heeexy.example.util.CommonUtil;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

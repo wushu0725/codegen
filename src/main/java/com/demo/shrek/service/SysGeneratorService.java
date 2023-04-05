@@ -12,5 +12,4 @@ public interface SysGeneratorService {
 	 * @return
 	 */
 	byte[] generatorCode(String tableNames);
-
 }

@@ -1,4 +1,4 @@
-package ${package}.service;
+package ${package}.${tableName}.service;
 
 
 import com.alibaba.fastjson.JSONObject;
