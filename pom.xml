@@ -17,7 +17,7 @@
 		<commons.lang.version>2.6</commons.lang.version>
 		<commons.io.version>2.5</commons.io.version>
 		<commons.configuration.version>1.10</commons.configuration.version>
-		<fastjson.version>1.2.31</fastjson.version>
+<!--		<fastjson.version>1.2.31</fastjson.version>-->
 		<velocity.version>1.7</velocity.version>
 	</properties>
   
@@ -87,6 +87,13 @@
 		  <artifactId>commons-configuration</artifactId>
 		  <version>${commons.configuration.version}</version>
 	  </dependency>
+	  <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+	  <dependency>
+		  <groupId>com.alibaba</groupId>
+		  <artifactId>fastjson</artifactId>
+		  <version>2.0.24</version>
+	  </dependency>
+
   </dependencies>
 	<build>
 		<plugins>

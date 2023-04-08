@@ -1,15 +1,12 @@
-package ${package}.${tableName}.controller;
+package ${package}.${backmodule}.controller;
 
-import ${package}.${tableName}.service.${className}Service;
+import ${package}.${backmodule}.service.${className}Service;
 import org.springframework.web.bind.annotation.*;
 import com.alibaba.fastjson.JSONObject;
+import ${package}.${common}.Result;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import com.heeexy.example.util.CommonUtil;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("${secondModuleName}")
@@ -18,23 +15,23 @@ public class ${className}Controller {
     @Resource
     private ${className}Service ${classname}Service;
 
-    @PostMapping
-    public JSONObject insert(@RequestBody JSONObject requestJson) {
+    @PostMapping("/insert")
+    public Result insert(@RequestBody JSONObject requestJson) {
         return ${classname}Service.insert(requestJson);
     }
 
-    @PostMapping
-    public JSONObject update(@RequestBody JSONObject requestJson) {
+    @PostMapping("/update")
+    public Result update(@RequestBody JSONObject requestJson) {
         return ${classname}Service.update(requestJson);
     }
 
-    @PostMapping(/{id})
-    public JSONObject delete(@PathVariable(name = "id") String id) {
+    @PostMapping("/delete/{id}")
+    public Result delete(@PathVariable(name = "id") String id) {
         return ${classname}Service.delete(Long.valueOf(id));
     }
 
-    @PostMapping
-    public JSONObject list(@RequestBody JSONObject requestJson) {
+    @PostMapping("/list")
+    public Result list(@RequestBody JSONObject requestJson) {
         return ${classname}Service.list(requestJson);
     }
 }
