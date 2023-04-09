@@ -34,4 +34,9 @@ public class ${className}Controller {
     public Result list(@RequestBody JSONObject requestJson) {
         return ${classname}Service.list(requestJson);
     }
+
+    @PostMapping("/get/{id}")
+    public Result get(@PathVariable(name = "id") String id) {
+        return ${classname}Service.get(Long.valueOf(id));
+    }
 }

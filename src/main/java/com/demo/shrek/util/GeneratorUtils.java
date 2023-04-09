@@ -171,8 +171,9 @@ public class GeneratorUtils {
 
     /**
      * 根据TableEntity封装VelocityContext
+     *
      * @param tableEntity
-     * @param moduleName 后端模块名称
+     * @param moduleName  后端模块名称
      * @return
      */
     private static VelocityContext initVelocityContext(TableEntity tableEntity, String moduleName) {
@@ -195,6 +196,7 @@ public class GeneratorUtils {
 
     /**
      * 将Velocity配置文件内容放入context
+     *
      * @param map
      * @param config
      * @return
@@ -203,14 +205,22 @@ public class GeneratorUtils {
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {
             String next = keys.next();
-            map.put(next, config.getString(next));
+            if (StringUtils.isNotBlank(next)) {
+                map.put(next, config.getString(next));
+            }
         }
-        map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_TIME_PATTERN));
+        map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_PATTERN));
+        if (map.containsKey("delColumn")) {
+            if (!map.containsKey("delVal") || !map.containsKey("unDelVal")) {
+                throw new RuntimeException("逻辑删除字段缺少逻辑删除值!");
+            }
+        }
         return new VelocityContext(map);
     }
 
     /**
      * TableEntity的get方法放入context
+     *
      * @param map
      * @param tableEntity
      */

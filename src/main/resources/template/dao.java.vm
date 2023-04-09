@@ -19,6 +19,8 @@ public interface ${className}Dao {
 
     List<JSONObject> listByPage(JSONObject jsonObject);
 
+    JSONObject getById(Long id);
+
     int delete (Long id);
 
     int count(JSONObject jsonObject);

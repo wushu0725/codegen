@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import ${package}.${backmodule}.service.${className}Service;
 import ${package}.${common}.Result;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,32 +26,38 @@ public class ${className}ServiceImpl implements ${className}Service {
     private ${className}Dao ${classname}Dao;
 
     @Override
-    public Result update(JSONObject jsonObject){
-        ${classname}Dao.update(jsonObject);
+    public Result update(JSONObject jsonObject) {
+            ${classname}Dao.update(jsonObject);
         return Result.ok();
     }
 
     @Override
-    public Result insert(JSONObject jsonObject){
-        ${classname}Dao.insert(jsonObject);
+    public Result insert(JSONObject jsonObject) {
+            ${classname}Dao.insert(jsonObject);
         return Result.ok();
     }
 
     @Override
-    public Result list(JSONObject jsonObject){
+    public Result list(JSONObject jsonObject) {
         List<JSONObject> list = ${classname}Dao.listByPage(jsonObject);
         return Result.okData(list);
     }
 
     @Override
-    public Result count(JSONObject jsonObject){
+    public Result count(JSONObject jsonObject) {
         int count = ${classname}Dao.count(jsonObject);
         return Result.okData(count);
     }
 
     @Override
-    public Result delete (Long id){
-        ${classname}Dao.delete(id);
+    public Result delete(Long id) {
+            ${classname}Dao.delete(id);
         return Result.ok();
+    }
+
+    @Override
+    public Result get(Long id) {
+        JSONObject json = ${classname}Dao.get(id);
+        return Result.okData(json);
     }
 }

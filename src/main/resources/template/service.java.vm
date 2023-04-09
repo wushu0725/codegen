@@ -22,4 +22,6 @@ public interface ${className}Service {
     Result delete (Long id);
 
     Result count(JSONObject jsonObject);
+
+    Result get(Long id);
 }
