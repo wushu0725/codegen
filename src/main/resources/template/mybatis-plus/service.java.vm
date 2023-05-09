@@ -1,0 +1,18 @@
+package ${package}.${backmodule}.service;
+
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+import ${package}.${common}.Result;
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+
+@Service
+public class ${className}Service extends ServiceImpl{
+
+}

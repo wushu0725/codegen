@@ -41,7 +41,7 @@
             #end
         </where>
         ORDER BY obj.id DESC
-        LIMIT #{offSet}, #{pageRow}
+        LIMIT #{page-1}*#{size}, #{size}
     </select>
 
     <select id="getById"  parameterType="java.lang.Long" resultType="com.alibaba.fastjson.JSONObject">

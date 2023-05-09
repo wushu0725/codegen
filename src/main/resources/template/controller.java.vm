@@ -7,6 +7,7 @@ import ${package}.${common}.Result;
 
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${secondModuleName}")
@@ -15,28 +16,41 @@ public class ${className}Controller {
     @Resource
     private ${className}Service ${classname}Service;
 
-    @PostMapping("/insert")
+    @PostMapping("/save")
     public Result insert(@RequestBody JSONObject requestJson) {
-        return ${classname}Service.insert(requestJson);
+        ${className} obj = JSONObject.parse(requestJson.toJSONString()},${className}.getClass());
+        ${classname}Service.saveOrUpdate(obj);
+        return Result.ok();
     }
 
     @PostMapping("/update")
     public Result update(@RequestBody JSONObject requestJson) {
-        return ${classname}Service.update(requestJson);
+        String pk = requestJson.getString("${id}");
+        if(Objects.isNull(${classname}Service.getById(pk))){
+            return Result.fail(String.format("%s对象不存在",${classname}))
+        }
+        ${className} obj = JSONObject.parse(requestJson.toJSONString()},${className}.getClass());
+        ${classname}Service.updateById(obj);
+        return Result.ok();
     }
 
     @PostMapping("/delete/{id}")
     public Result delete(@PathVariable(name = "id") String id) {
-        return ${classname}Service.delete(Long.valueOf(id));
+        String pk = requestJson.getString("${id}");
+        if(Objects.isNull(${classname}Service.getById(pk))){
+            return Result.fail(String.format("%s对象不存在",${classname}))
+        }
+        ${classname}Service.delete(${pkType}.valueOf(id))
+        return Result.ok();
     }
 
-    @PostMapping("/list")
-    public Result list(@RequestBody JSONObject requestJson) {
-        return ${classname}Service.list(requestJson);
+    @PostMapping("/page")
+    public Result page(@RequestBody JSONObject requestJson) {
+        return ${classname}Service.page(requestJson);
     }
 
     @PostMapping("/get/{id}")
     public Result get(@PathVariable(name = "id") String id) {
-        return ${classname}Service.get(Long.valueOf(id));
+        return Result.okData(${classname}Service.getById(pk));
     }
 }

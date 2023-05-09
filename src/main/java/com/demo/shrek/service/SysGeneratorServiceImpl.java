@@ -9,15 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -57,7 +51,7 @@ public class SysGeneratorServiceImpl implements SysGeneratorService{
     }
 
     @Override
-    public void generatorCodeForEachModule(JSONObject module,ZipOutputStream zip,ByteArrayOutputStream outputStream) {
+    public void generatorCodeForEachModule(String isPlus,JSONObject module,ZipOutputStream zip,ByteArrayOutputStream outputStream) {
         String name = module.getString("name");
         JSONArray tables = module.getJSONArray("table");
 
@@ -70,14 +64,19 @@ public class SysGeneratorServiceImpl implements SysGeneratorService{
             List<Map<String, String>> columns = queryColumns(tableName);
 
             if(!columns.isEmpty()){
-                GeneratorUtils.generatorCode(tableInfo,columns,name,zip);
+               if("1".equals(isPlus)){
+                   GeneratorUtils.generatePlusCode(isPlus,tableInfo,columns,name,zip);
+               }else {
+                   GeneratorUtils.generatorCode(tableInfo,columns,name,zip);
+               }
             }
         }
     }
 
+
     @Override
-    public void generatorOtherFile(ZipOutputStream zip, ByteArrayOutputStream outputStream) {
-        GeneratorUtils.generatorPomAndPropertiesFile(zip);
+    public void generatorOtherFile(String isPlus,ZipOutputStream zip, ByteArrayOutputStream outputStream) {
+        GeneratorUtils.generatorPomAndPropertiesFile(isPlus,zip);
         org.apache.commons.io.IOUtils.closeQuietly(zip);
     }
 }

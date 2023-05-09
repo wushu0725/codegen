@@ -1,0 +1,53 @@
+package ${package}.${backmodule}.controller;
+
+import ${package}.${backmodule}.service.${className}Service;
+import ${package}.${common}.Result;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+/**
+ * <p>
+ * 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${datetime}
+ */
+@RestController
+@RequestMapping("/${secondModuleName}/")
+public class ${className}Controller {
+
+    @Resource
+    private ${className}Service ${classname}Service;
+
+    @PostMapping("/add")
+    public Result insert(@RequestBody JSONObject requestJson) {
+
+        return ${classname}Service.create(requestJson);
+    }
+
+    @PostMapping("/updateById")
+    public Result update(@RequestBody JSONObject requestJson) {
+        return ${classname}Service.update(requestJson);
+    }
+
+    @PostMapping("/delById/{${id}}")
+    public Result delete(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.deleteById(Long.valueOf(id));
+    }
+
+    @PostMapping("/page")
+    public Result page(@RequestBody JSONObject requestJson) {
+        return ${classname}Service.page(requestJson);
+    }
+
+    @PostMapping("/getById/{${id}}")
+    public Result get(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.selectById(Long.valueOf(id));
+    }
+
+}

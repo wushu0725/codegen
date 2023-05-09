@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import ${package}.${backmodule}.service.${className}Service;
 import ${package}.${common}.Result;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,12 @@ public class ${className}ServiceImpl implements ${className}Service {
     }
 
     @Override
-    public Result list(JSONObject jsonObject) {
+    public Result page(JSONObject jsonObject) {
+        if(Objects.isNull(jsonObject)){
+            jsonObject = new JSONObject();
+            jsonObject.put("size",20);
+            jsonObject.put("currentPage",1);
+        }
         List<JSONObject> list = ${classname}Dao.listByPage(jsonObject);
         return Result.okData(list);
     }
@@ -57,7 +63,7 @@ public class ${className}ServiceImpl implements ${className}Service {
 
     @Override
     public Result get(Long id) {
-        JSONObject json = ${classname}Dao.get(id);
+        JSONObject json = ${classname}Dao.getById(id);
         return Result.okData(json);
     }
 }

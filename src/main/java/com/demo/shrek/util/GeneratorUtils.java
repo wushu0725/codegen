@@ -11,6 +11,7 @@ import org.apache.commons.lang.WordUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
@@ -31,18 +32,37 @@ public class GeneratorUtils {
 
     public static List<String> getTemplates() {
         List<String> templates = new ArrayList<String>();
-        //templates.add("template/index.js.vm");
         templates.add("template/index.vue.vm");
         templates.add("template/mapper.xml.vm");
         templates.add("template/service.java.vm");
         templates.add("template/serviceimpl.java.vm");
-//        templates.add("template/pom.xml.vm");
-//        templates.add("template/application.properties.vm");
-        //templates.add("template/entity.java.vm");
         templates.add("template/dao.java.vm");
         templates.add("template/controller.java.vm");
 
         return templates;
+    }
+
+    public static List<String> getPlusTemplates() {
+        List<String> templates = new ArrayList<String>();
+        templates.add("template/mybatis-plus/serviceimpl.java.vm");
+        templates.add("template/mybatis-plus/mapper.java.vm");
+        templates.add("template/mybatis-plus/controller.java.vm");
+
+        return templates;
+    }
+
+    public static List<String> getOtherTemplates(String isPlus) {
+        List<String> templates = new ArrayList<String>();
+       if("1".equals(isPlus)){
+           templates.add("template/mybatis-plus/pom.xml.vm");
+           templates.add("template/application.properties.vm");
+           templates.add("template/Application.java.vm");
+           templates.add("template/Result.java.vm");
+       }
+       if(StringUtils.isEmpty(isPlus)){
+           templates =  getOtherTemplates();
+       }
+       return templates;
     }
 
     public static List<String> getOtherTemplates() {
@@ -68,7 +88,7 @@ public class GeneratorUtils {
         String className = tableToJava(tableEntity.getTableName(), config.getString("tablePrefix"));
         tableEntity.setClassName(className);
         tableEntity.setClassname(StringUtils.uncapitalize(className));
-
+        tableEntity.setPathName(StringUtils.lowerCase(className));
         //列信息
         List<ColumnEntity> columsList = new ArrayList<>();
         for (Map<String, String> column : columns) {
@@ -116,6 +136,31 @@ public class GeneratorUtils {
 
         // 模板文件
         List<String> templates = getTemplates();
+
+        // 输出zip
+        writeZip(null,templates,tableEntity,context,config,zip,moduleName);
+    }
+
+    public static void generatePlusCode(String isPlus,Map<String, String> table, List<Map<String, String>> columns, String moduleName, ZipOutputStream zip) {
+
+        //配置信息
+        Configuration config = getConfig();
+
+        //表信息
+        TableEntity tableEntity = initTableEntity(table, columns);
+
+        //封装模板数据
+        VelocityContext context = initVelocityContext(tableEntity, moduleName);
+
+        // 模板文件
+        List<String> templates = getPlusTemplates();
+
+        // 输出zip
+        writeZip(isPlus,templates,tableEntity,context,config,zip,moduleName);
+
+    }
+
+    private static void writeZip(String isPlus,List<String> templates,TableEntity tableEntity,VelocityContext context,Configuration config,ZipOutputStream zip, String moduleName){
         for (String template : templates) {
             //渲染模板
             StringWriter sw = new StringWriter();
@@ -124,7 +169,8 @@ public class GeneratorUtils {
             try {
                 //添加到zip
                 zip.putNextEntry(new ZipEntry(
-                        getFileName(tableEntity.getTableName(), template, config.getString("project"), tableEntity.getClassName(), config.getString("package"), config.getString("mainModule"), moduleName)));
+                        getFileName(isPlus,tableEntity.getTableName(), template,
+                                config.getString("project"), tableEntity.getClassName(), config.getString("package"), config.getString("mainModule"), moduleName)));
                 IOUtils.write(sw.toString(), zip, "UTF-8");
                 IOUtils.closeQuietly(sw);
                 zip.closeEntry();
@@ -296,7 +342,7 @@ public class GeneratorUtils {
             return packagePath + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
         }
 
-        if (template.contains("dao.java.vm")) {
+        if (template.contains("mapper.java.vm")) {
             return packagePath + "dao" + File.separator + className + "Dao.java";
         }
 
@@ -318,42 +364,59 @@ public class GeneratorUtils {
         return null;
     }
 
+
     /**
      * 获取文件名
      */
-    public static String getFileName(String tableName, String template, String projectName, String
+    public static String getFileName(String isPlus,String tableName, String template, String projectName, String
             className, String packageName, String fontModule, String backModule) {
         String packagePath = "src" + File.separator + "main" + File.separator + "java" + File.separator;
         String frontPath = "ui" + File.separator;
         if (StringUtils.isNotBlank(packageName)) {
             packagePath += packageName.replace(".", File.separator) + File.separator + backModule + File.separator;
         }
+        if(StringUtils.isEmpty(isPlus)){
+            if (template.contains("index.js.vm")) {
+                return frontPath + "api" + File.separator + fontModule + File.separator + toLowerCaseFirstOne(className) + File.separator + "index.js";
+            }
+            if (template.contains("index.vue.vm")) {
+                return frontPath + "views" + File.separator + fontModule + File.separator + toLowerCaseFirstOne(className) + File.separator + "index.vue";
+            }
 
-        if (template.contains("index.js.vm")) {
-            return frontPath + "api" + File.separator + fontModule + File.separator + toLowerCaseFirstOne(className) + File.separator + "index.js";
+            if (template.contains("service.java.vm")) {
+                return packagePath + "service" + File.separator + className + "Service.java";
+            }
+
+            if (template.contains("serviceimpl.java.vm")) {
+                return packagePath + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
+            }
+
+            if (template.contains("mapper.java.vm")) {
+                return packagePath + "dao" + File.separator + className + "Dao.java";
+            }
+
+            if (template.contains("controller.java.vm")) {
+                return packagePath + "controller" + File.separator + className + "Controller.java";
+            }
+            if (template.contains("mapper.xml.vm")) {
+                return "src" + File.separator + "main" + File.separator + "resources" + File.separator + backModule + File.separator + "mapper" + File.separator + className + "Mapper.xml";
+            }
         }
 
-        if (template.contains("index.vue.vm")) {
-            return frontPath + "views" + File.separator + fontModule + File.separator + toLowerCaseFirstOne(className) + File.separator + "index.vue";
-        }
+        if("1".equals(isPlus)){
+            if (template.contains("mapper.xml.vm")) {
+                return "src" + File.separator + "main" + File.separator + "resources" + File.separator + backModule + File.separator + "mapper" + File.separator + className + "Mapper.xml";
+            }
+            if (template.contains("mapper.java.vm")) {
+                return packagePath + "mapper" + File.separator + className + "Mapper.java";
+            }
+            if (template.contains("controller.java.vm")) {
+                return packagePath + "controller" + File.separator + className + "Controller.java";
+            }
+            if (template.contains("service.java.vm")) {
+                return packagePath + "service" + File.separator + className + "Service.java";
+            }
 
-        if (template.contains("service.java.vm")) {
-            return packagePath + "service" + File.separator + className + "Service.java";
-        }
-
-        if (template.contains("serviceimpl.java.vm")) {
-            return packagePath + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
-        }
-
-        if (template.contains("dao.java.vm")) {
-            return packagePath + "dao" + File.separator + className + "Dao.java";
-        }
-
-        if (template.contains("controller.java.vm")) {
-            return packagePath + "controller" + File.separator + className + "Controller.java";
-        }
-        if (template.contains("mapper.xml.vm")) {
-            return "src" + File.separator + "main" + File.separator + "resources" + File.separator + backModule + File.separator + "mapper" + File.separator + className + "Mapper.xml";
         }
 
         return null;
@@ -369,7 +432,7 @@ public class GeneratorUtils {
     }
 
     // 生成pom文件、配置文件和启动类
-    public static void generatorPomAndPropertiesFile(ZipOutputStream zip) {
+    public static void generatorPomAndPropertiesFile(String isPlus,ZipOutputStream zip) {
 
         Configuration config = getConfig();
         //设置velocity资源加载器
@@ -381,7 +444,7 @@ public class GeneratorUtils {
         VelocityContext context = putConfig2VelocityContext(map, config);
 
         // 模板文件
-        List<String> templates = getOtherTemplates();
+        List<String> templates = getOtherTemplates(isPlus);
         for (String template : templates) {
             //渲染模板
             StringWriter sw = new StringWriter();
@@ -412,8 +475,14 @@ public class GeneratorUtils {
             return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + "Application.java";
         }
 
-        if (template.contains("Result.java.vm")) {
-            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "Result.java";
+        if (template.contains("Result.java.vm") || template.contains("Page.java.vm")) {
+            template = template.replace(".vm", "");
+            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + template;
+        }
+
+        if (template.contains("PageInterceptor.java.vm")) {
+            template = template.replace(".vm", "");
+            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + template;
         }
         return null;
     }

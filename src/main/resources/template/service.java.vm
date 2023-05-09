@@ -17,7 +17,7 @@ public interface ${className}Service {
 
     Result insert(JSONObject jsonObject);
 
-    Result list(JSONObject jsonObject);
+    Result page(JSONObject jsonObject);
 
     Result delete (Long id);
 

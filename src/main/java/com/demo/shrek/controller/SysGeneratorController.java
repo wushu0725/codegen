@@ -56,6 +56,7 @@ public class SysGeneratorController {
         String project = paramObj.getString("project");
         JSONArray moduleArray = paramObj.getJSONArray("module");
         Iterator iterator = moduleArray.iterator();
+        String isPlus = paramObj.getString("isPlus");
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(stream);
@@ -63,10 +64,10 @@ public class SysGeneratorController {
         List<byte[]> data = new ArrayList<>();
         while (iterator.hasNext()) {
             JSONObject module = (JSONObject) iterator.next();
-            sysGeneratorService.generatorCodeForEachModule(module,zip,stream);
+            sysGeneratorService.generatorCodeForEachModule(isPlus,module,zip,stream);
         }
 
-        sysGeneratorService.generatorOtherFile(zip,stream);
+        sysGeneratorService.generatorOtherFile(isPlus,zip,stream);
         IOUtils.closeQuietly(zip);
         data.add(stream.toByteArray());
 
