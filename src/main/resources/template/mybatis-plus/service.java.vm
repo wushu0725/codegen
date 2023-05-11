@@ -47,7 +47,9 @@ public class ${className}Service extends ServiceImpl<${className}Mapper,${classN
                 String val = next.getString("val");
                 String condition = next.getString("condition");
                 try {
-                    wrapper.getClass().getMethod(expression).invoke(attr, val);
+                    wrapper.getClass().getSuperclass()
+                            .getMethod(expression,boolean.class,Object.class,Object.class)
+                            .invoke(wrapper, true, attr, val);
                 } catch (Exception e) {
                     log.info("findByPage error：{}", e.getMessage(), e);
                     break;
