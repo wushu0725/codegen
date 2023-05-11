@@ -1,47 +1,43 @@
 package ${package}.${backmodule}.controller;
 
 import ${package}.${backmodule}.service.${className}Service;
-import org.springframework.web.bind.annotation.*;
-import com.alibaba.fastjson.JSONObject;
 import ${package}.${common}.Result;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Objects;
+import java.util.*;
 
+/**
+ * <p>
+ * 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${datetime}
+ */
 @RestController
-@RequestMapping("${secondModuleName}")
+@RequestMapping("/${secondModuleName}/")
 public class ${className}Controller {
 
     @Resource
     private ${className}Service ${classname}Service;
 
-    @PostMapping("/save")
+    @PostMapping("/add")
     public Result insert(@RequestBody JSONObject requestJson) {
-        ${className} obj = JSONObject.parse(requestJson.toJSONString()},${className}.getClass());
-        ${classname}Service.saveOrUpdate(obj);
-        return Result.ok();
+
+        return ${classname}Service.create(requestJson);
     }
 
-    @PostMapping("/update")
+    @PostMapping("/updateById")
     public Result update(@RequestBody JSONObject requestJson) {
-        String pk = requestJson.getString("${id}");
-        if(Objects.isNull(${classname}Service.getById(pk))){
-            return Result.fail(String.format("%s对象不存在",${classname}))
-        }
-        ${className} obj = JSONObject.parse(requestJson.toJSONString()},${className}.getClass());
-        ${classname}Service.updateById(obj);
-        return Result.ok();
+        return ${classname}Service.update(requestJson);
     }
 
-    @PostMapping("/delete/{id}")
-    public Result delete(@PathVariable(name = "id") String id) {
-        String pk = requestJson.getString("${id}");
-        if(Objects.isNull(${classname}Service.getById(pk))){
-            return Result.fail(String.format("%s对象不存在",${classname}))
-        }
-        ${classname}Service.delete(${pkType}.valueOf(id))
-        return Result.ok();
+    @PostMapping("/delById/{${id}}")
+    public Result delete(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.deleteById(Long.valueOf(id));
     }
 
     @PostMapping("/page")
@@ -49,8 +45,9 @@ public class ${className}Controller {
         return ${classname}Service.page(requestJson);
     }
 
-    @PostMapping("/get/{id}")
-    public Result get(@PathVariable(name = "id") String id) {
-        return Result.okData(${classname}Service.getById(pk));
+    @PostMapping("/getById/{${id}}")
+    public Result get(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.selectById(Long.valueOf(id));
     }
+
 }

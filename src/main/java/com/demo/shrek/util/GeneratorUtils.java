@@ -37,32 +37,35 @@ public class GeneratorUtils {
         templates.add("template/service.java.vm");
         templates.add("template/serviceimpl.java.vm");
         templates.add("template/dao.java.vm");
-        templates.add("template/controller.java.vm");
+        templates.add("template/mybatis-plus/controller.java.vm");
 
         return templates;
     }
 
     public static List<String> getPlusTemplates() {
         List<String> templates = new ArrayList<String>();
-        templates.add("template/mybatis-plus/serviceimpl.java.vm");
-        templates.add("template/mybatis-plus/mapper.java.vm");
         templates.add("template/mybatis-plus/controller.java.vm");
-
+        templates.add("template/mybatis-plus/service.java.vm");
+        templates.add("template/mybatis-plus/mapper.java.vm");
+        templates.add("template/mybatis-plus/mapper.xml.vm");
+        templates.add("template/mybatis-plus/entity.java.vm");
         return templates;
     }
 
     public static List<String> getOtherTemplates(String isPlus) {
         List<String> templates = new ArrayList<String>();
-       if("1".equals(isPlus)){
-           templates.add("template/mybatis-plus/pom.xml.vm");
-           templates.add("template/application.properties.vm");
-           templates.add("template/Application.java.vm");
-           templates.add("template/Result.java.vm");
-       }
-       if(StringUtils.isEmpty(isPlus)){
-           templates =  getOtherTemplates();
-       }
-       return templates;
+        if ("1".equals(isPlus)) {
+            templates.add("template/mybatis-plus/pom.xml.vm");
+            templates.add("template/mybatis-plus/MybatisPlusConfig.java.vm");
+            //templates.add("template/mybatis-plus/CrossConfig.java.vm");
+            templates.add("template/mybatis-plus/Application.java.vm");
+            templates.add("template/application.properties.vm");
+            templates.add("template/Result.java.vm");
+        }
+        if (StringUtils.isEmpty(isPlus)) {
+            templates = getOtherTemplates();
+        }
+        return templates;
     }
 
     public static List<String> getOtherTemplates() {
@@ -138,10 +141,10 @@ public class GeneratorUtils {
         List<String> templates = getTemplates();
 
         // 输出zip
-        writeZip(null,templates,tableEntity,context,config,zip,moduleName);
+        writeZip(null, templates, tableEntity, context, config, zip, moduleName);
     }
 
-    public static void generatePlusCode(String isPlus,Map<String, String> table, List<Map<String, String>> columns, String moduleName, ZipOutputStream zip) {
+    public static void generatePlusCode(String isPlus, Map<String, String> table, List<Map<String, String>> columns, String moduleName, ZipOutputStream zip) {
 
         //配置信息
         Configuration config = getConfig();
@@ -156,11 +159,11 @@ public class GeneratorUtils {
         List<String> templates = getPlusTemplates();
 
         // 输出zip
-        writeZip(isPlus,templates,tableEntity,context,config,zip,moduleName);
+        writeZip(isPlus, templates, tableEntity, context, config, zip, moduleName);
 
     }
 
-    private static void writeZip(String isPlus,List<String> templates,TableEntity tableEntity,VelocityContext context,Configuration config,ZipOutputStream zip, String moduleName){
+    private static void writeZip(String isPlus, List<String> templates, TableEntity tableEntity, VelocityContext context, Configuration config, ZipOutputStream zip, String moduleName) {
         for (String template : templates) {
             //渲染模板
             StringWriter sw = new StringWriter();
@@ -169,7 +172,7 @@ public class GeneratorUtils {
             try {
                 //添加到zip
                 zip.putNextEntry(new ZipEntry(
-                        getFileName(isPlus,tableEntity.getTableName(), template,
+                        getFileName(isPlus, tableEntity.getTableName(), template,
                                 config.getString("project"), tableEntity.getClassName(), config.getString("package"), config.getString("mainModule"), moduleName)));
                 IOUtils.write(sw.toString(), zip, "UTF-8");
                 IOUtils.closeQuietly(sw);
@@ -368,14 +371,14 @@ public class GeneratorUtils {
     /**
      * 获取文件名
      */
-    public static String getFileName(String isPlus,String tableName, String template, String projectName, String
+    public static String getFileName(String isPlus, String tableName, String template, String projectName, String
             className, String packageName, String fontModule, String backModule) {
         String packagePath = "src" + File.separator + "main" + File.separator + "java" + File.separator;
         String frontPath = "ui" + File.separator;
         if (StringUtils.isNotBlank(packageName)) {
             packagePath += packageName.replace(".", File.separator) + File.separator + backModule + File.separator;
         }
-        if(StringUtils.isEmpty(isPlus)){
+        if (StringUtils.isEmpty(isPlus)) {
             if (template.contains("index.js.vm")) {
                 return frontPath + "api" + File.separator + fontModule + File.separator + toLowerCaseFirstOne(className) + File.separator + "index.js";
             }
@@ -403,7 +406,7 @@ public class GeneratorUtils {
             }
         }
 
-        if("1".equals(isPlus)){
+        if ("1".equals(isPlus)) {
             if (template.contains("mapper.xml.vm")) {
                 return "src" + File.separator + "main" + File.separator + "resources" + File.separator + backModule + File.separator + "mapper" + File.separator + className + "Mapper.xml";
             }
@@ -415,6 +418,9 @@ public class GeneratorUtils {
             }
             if (template.contains("service.java.vm")) {
                 return packagePath + "service" + File.separator + className + "Service.java";
+            }
+            if (template.contains("entity.java.vm")) {
+                return packagePath + "entity" + File.separator + className + ".java";
             }
 
         }
@@ -432,7 +438,7 @@ public class GeneratorUtils {
     }
 
     // 生成pom文件、配置文件和启动类
-    public static void generatorPomAndPropertiesFile(String isPlus,ZipOutputStream zip) {
+    public static void generatorPomAndPropertiesFile(String isPlus, ZipOutputStream zip) {
 
         Configuration config = getConfig();
         //设置velocity资源加载器
@@ -442,6 +448,7 @@ public class GeneratorUtils {
         //封装模板数据
         Map<String, Object> map = new HashMap<>();
         VelocityContext context = putConfig2VelocityContext(map, config);
+        context.put("isPlus", isPlus);
 
         // 模板文件
         List<String> templates = getOtherTemplates(isPlus);
@@ -472,17 +479,24 @@ public class GeneratorUtils {
         }
 
         if (template.contains("Application.java.vm")) {
-            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + "Application.java";
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + "Application.java";
         }
 
-        if (template.contains("Result.java.vm") || template.contains("Page.java.vm")) {
-            template = template.replace(".vm", "");
-            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + template;
+        if (template.contains("Result.java.vm")) {
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "Result.java";
+        }
+
+        if (template.contains("CrossConfig.java.vm")) {
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + "CrossConfig.java";
+        }
+
+        if (template.contains("MybatisPlusConfig.java.vm")) {
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + "MybatisPlusConfig.java";
         }
 
         if (template.contains("PageInterceptor.java.vm")) {
             template = template.replace(".vm", "");
-            return File.separator + "src" + File.separator + "main" + File.separator + "java  " + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + template;
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + template;
         }
         return null;
     }

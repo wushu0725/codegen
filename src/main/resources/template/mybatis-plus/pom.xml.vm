@@ -5,8 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${package}</groupId>
-    <artifactId>${porject}</artifactId>
+    <artifactId>${project}</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <commons.lang.version>2.6</commons.lang.version>
+        <mybatis-plus.version>3.4.0</mybatis-plus.version>
+        <spring-boot.version>2.3.5.RELEASE</spring-boot.version>
+    </properties>
 
     <!--    项目依赖-->
     <dependencies>
@@ -15,7 +21,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>2.0.1.RELEASE</version>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.24</version>
         </dependency>
 
 
@@ -31,7 +49,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.0.3</version>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
         <!--        lombok依赖，在实体类上@Data就是，省略构造方法和setter getter方法-->
