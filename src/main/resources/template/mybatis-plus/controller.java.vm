@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import ${package}.${common}.Result;
 import ${package}.${backmodule}.entity.${className};
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import${package}.${common}.CommonPageService;
 
 
 import javax.annotation.Resource;
@@ -18,6 +19,8 @@ public class ${className}Controller {
 
     @Resource
     private ${className}Service ${classname}Service;
+
+    private CommonPageService<${className}> commonPageService;
 
     @PostMapping("/save")
     public Result insert(@RequestBody JSONObject requestJson) {
@@ -45,7 +48,13 @@ public class ${className}Controller {
 
     @PostMapping("/page")
     public Result page(@RequestBody JSONObject requestJson) {
-        IPage<${className}> page = ${classname}Service.findByPage(requestJson);
+        Page<Menu> page = new Page<>();
+        if (StringUtils.isNotEmpty(requestJson.getString("page"))) {
+            JSONObject obj = requestJson.getJSONObject("page");
+            page = new Page<>(obj.getLong("current"), obj.getLong("size"));
+        }
+        QueryWrapper<${className}> wrapper = commonPageService.initMbpWrapper(requestJson);
+        IPage<${className}> objs = menuService.page(page,wrapper);
         return Result.okData(page);
     }
 

@@ -1,22 +1,13 @@
 package ${package}.${backmodule}.service;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import ${package}.${backmodule}.entity.${className};
 import ${package}.${backmodule}.mapper.${className}Mapper;
-import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
+
 
 /**
  * ${comments}
@@ -26,36 +17,6 @@ import java.util.Iterator;
  */
 
 @Service
-@Slf4j
 public class ${className}Service extends ServiceImpl<${className}Mapper,${className}> {
 
-    public IPage<${className}> findByPage(JSONObject requestJson) {
-        Page<${className}> page = new Page<>();
-        if (StringUtils.isNotEmpty(requestJson.getString("PageParam"))) {
-            JSONObject obj = requestJson.getJSONObject("PageParam");
-            page = new Page<>(obj.getLong("current"), obj.getLong("size"));
-        }
-
-        QueryWrapper<${className}> wrapper = new QueryWrapper<>();
-        if (StringUtils.isNotEmpty(requestJson.getString("query"))) {
-            JSONArray query = requestJson.getJSONArray("query");
-            Iterator iterator = query.iterator();
-            while (iterator.hasNext()) {
-                JSONObject next = (JSONObject) iterator.next();
-                String expression = next.getString("expression");
-                String attr = next.getString("attr");
-                String val = next.getString("val");
-                String condition = next.getString("condition");
-                try {
-                    wrapper.getClass().getSuperclass()
-                            .getMethod(expression,boolean.class,Object.class,Object.class)
-                            .invoke(wrapper, true, attr, val);
-                } catch (Exception e) {
-                    log.info("findByPage error：{}", e.getMessage(), e);
-                    break;
-                }
-            }
-        }
-        return this.page(page, wrapper);
-    }
 }

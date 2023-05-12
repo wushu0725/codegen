@@ -57,6 +57,7 @@ public class GeneratorUtils {
         if ("1".equals(isPlus)) {
             templates.add("template/mybatis-plus/pom.xml.vm");
             templates.add("template/mybatis-plus/MybatisPlusConfig.java.vm");
+            templates.add("template/mybatis-plus/commonPageService.java.vm");
             //templates.add("template/mybatis-plus/CrossConfig.java.vm");
             templates.add("template/mybatis-plus/Application.java.vm");
             templates.add("template/application.properties.vm");
@@ -486,8 +487,8 @@ public class GeneratorUtils {
             return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "Result.java";
         }
 
-        if (template.contains("CrossConfig.java.vm")) {
-            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "config" + File.separator + "CrossConfig.java";
+        if (template.contains("commonPageService.java.vm")) {
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "commonPageService.java";
         }
 
         if (template.contains("MybatisPlusConfig.java.vm")) {
