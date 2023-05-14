@@ -32,7 +32,7 @@ public class CommonPageService<T> {
             JSONArray query = requestJson.getJSONArray("query");
             Iterator iterator = query.iterator();
             while (iterator.hasNext()) {
-                JSONObject next = (JSONObject) iterator.next();
+                JSONObject next = JSON.parseObject(JSON.toJSONString(iterator.next()));
                 String expression = next.getString("expression");
                 String attr = next.getString("attr");
                 String val = next.getString("val");

@@ -3,9 +3,7 @@ package ${package}.${backmodule}.controller;
 import ${package}.${backmodule}.service.${className}Service;
 import ${package}.${common}.Result;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.annotation.Resource;
 import java.util.*;
 

@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.demo.shrek.service.SysGeneratorService;
 import com.demo.shrek.util.GeneratorUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,6 +26,7 @@ import java.util.zip.ZipOutputStream;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/generator")
+@Slf4j
 public class SysGeneratorController {
 
     private final SysGeneratorService sysGeneratorService;
@@ -52,11 +55,16 @@ public class SysGeneratorController {
      */
     @PostMapping("/allTable")
     public void allTable(@RequestBody Map<String, Object> map) throws IOException {
+        long start = System.currentTimeMillis();
+        log.info("Start to generate code ------------------");
+
         JSONObject paramObj = JSONObject.parseObject(JSON.toJSONString(map.get("param")));
         String project = paramObj.getString("project");
         JSONArray moduleArray = paramObj.getJSONArray("module");
         Iterator iterator = moduleArray.iterator();
         String isPlus = paramObj.getString("isPlus");
+        log.info("Query param：{}", paramObj.toJSONString());
+        log.info("protect type：[{}]", StringUtils.isNotBlank(isPlus) && "1".equals(isPlus) ? "mybatis-plus" : "mybatis");
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(stream);
@@ -64,10 +72,10 @@ public class SysGeneratorController {
         List<byte[]> data = new ArrayList<>();
         while (iterator.hasNext()) {
             JSONObject module = (JSONObject) iterator.next();
-            sysGeneratorService.generatorCodeForEachModule(isPlus,module,zip,stream);
+            sysGeneratorService.generatorCodeForEachModule(isPlus, module, zip, stream);
         }
 
-        sysGeneratorService.generatorOtherFile(isPlus,zip,stream);
+        sysGeneratorService.generatorOtherFile(isPlus, zip, stream);
         IOUtils.closeQuietly(zip);
         data.add(stream.toByteArray());
 
@@ -88,5 +96,6 @@ public class SysGeneratorController {
         response.setContentType("application/octet-stream; charset=UTF-8");
 
         IOUtils.write(finallyData, response.getOutputStream());
+        log.info("project {} generated [{}]ms ------------------", project, System.currentTimeMillis() - start);
     }
 }

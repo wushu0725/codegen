@@ -2,6 +2,7 @@ package com.demo.shrek.util;
 
 import com.demo.shrek.model.test.ColumnEntity;
 import com.demo.shrek.model.test.TableEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -28,6 +29,7 @@ import java.util.zip.ZipOutputStream;
  * @email sunlightcs@gmail.com
  * @date 2016年12月19日 下午11:40:24
  */
+@Slf4j
 public class GeneratorUtils {
 
     public static List<String> getTemplates() {
@@ -440,7 +442,7 @@ public class GeneratorUtils {
 
     // 生成pom文件、配置文件和启动类
     public static void generatorPomAndPropertiesFile(String isPlus, ZipOutputStream zip) {
-
+        log.info("Started to generate other file..");
         Configuration config = getConfig();
         //设置velocity资源加载器
         Properties prop = new Properties();
@@ -464,6 +466,7 @@ public class GeneratorUtils {
                 IOUtils.write(sw.toString(), zip, "UTF-8");
                 IOUtils.closeQuietly(sw);
                 zip.closeEntry();
+                log.info("File generated:[{}]", template.replaceAll(".vm", ""));
             } catch (IOException e) {
                 throw new RuntimeException("渲染模板失败" + e);
             }
@@ -488,7 +491,7 @@ public class GeneratorUtils {
         }
 
         if (template.contains("commonPageService.java.vm")) {
-            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "commonPageService.java";
+            return File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + aPackage.replace(".", File.separator) + File.separator + common + File.separator + "CommonPageService.java";
         }
 
         if (template.contains("MybatisPlusConfig.java.vm")) {
