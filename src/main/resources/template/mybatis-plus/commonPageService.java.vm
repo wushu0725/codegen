@@ -1,0 +1,87 @@
+package com.system.common;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+/**
+ * @author ${author}
+ * @Date @date ${datetime}
+ */
+
+@Service
+@Slf4j
+public class CommonPageService<T> {
+
+    static final List<String> COMMON_SQLEXP = Arrays.asList("eq", "ne", "gt", "ge", "lt", "le", "like", "notLike", "likeLeft", "likeRight");
+    static final List<String> IN_SQLEXP = Arrays.asList("in", "notIn");
+    static final List<String> ISNULL_SQLEXP = Arrays.asList("isNull", "isNotNull");
+    static final List<String> EXIST_SQLEXP = Arrays.asList("exists", "notExists");
+    static final List<String> BTW_SQLEXP = Arrays.asList("between", "notBetween");
+
+    public QueryWrapper<T> initMbpWrapper(JSONObject requestJson) throws Exception{
+        JSONObject sort = requestJson.getJSONObject("sort");
+        QueryWrapper<T> wrapper = new QueryWrapper<>();
+        Class<?> superclass = wrapper.getClass().getSuperclass();
+        if (StringUtils.isNotEmpty(requestJson.getString("query"))) {
+            JSONArray query = requestJson.getJSONArray("query");
+            Iterator iterator = query.iterator();
+            while (iterator.hasNext()) {
+                JSONObject next = JSON.parseObject(JSON.toJSONString(iterator.next()));
+                String expression = next.getString("expression");
+                String attr = next.getString("attr");
+                String val = next.getString("val");
+                try {
+                    if (COMMON_SQLEXP.contains(expression)) {
+                        superclass.getMethod(expression, boolean.class, Object.class, Object.class)
+                                .invoke(wrapper, true, attr, val);
+                    } else if (IN_SQLEXP.contains(expression)) {
+                        superclass.getMethod(expression, boolean.class, Object.class, Collection.class)
+                                .invoke(wrapper, true, attr, val);
+                    } else if (ISNULL_SQLEXP.contains(expression)) {
+                        superclass.getMethod(expression, boolean.class, Object.class, Object.class)
+                                .invoke(wrapper, true, attr, val);
+                    } else if (EXIST_SQLEXP.contains(expression)) {
+                        superclass.getMethod(expression, boolean.class, Object.class, String.class)
+                                .invoke(wrapper, true, attr, String.valueOf(val));
+                    } else if (BTW_SQLEXP.contains(expression)) {
+                        String str = String.valueOf(val);
+                        String[] vals = str.split(",");
+                        superclass.getMethod(expression, boolean.class, Object.class, Object.class, Object.class)
+                                .invoke(wrapper, true, attr, vals[0], vals[1]);
+                    }
+
+                } catch (Exception e) {
+                    log.info("findByPage error：{}", e.getMessage(), e);
+                    throw e;
+                }
+            }
+            try {
+                if (Objects.nonNull(sort)) {
+                    if (sort.containsKey("group")) {
+                        JSONObject group = sort.getJSONObject("group");
+                        Object attrs = group.getJSONArray("attr").toArray();
+                        superclass.getMethod("groupBy", boolean.class, Object[].class).invoke(wrapper, true, attrs);
+
+                    }
+                    if (sort.containsKey("order")) {
+                        JSONObject group = sort.getJSONObject("order");
+                        String isAsc = group.getString("isAsc");
+                        Object attrs = group.getJSONArray("attr").toArray();
+                        superclass.getMethod("orderBy", boolean.class, boolean.class, Object[].class)
+                                .invoke(wrapper, true, StringUtils.isNotEmpty(isAsc) && "1".equals(isAsc), attrs);
+                    }
+                }
+            } catch (Exception e) {
+                log.info("findByPage error：{}", e.getMessage(), e);
+                throw e;
+            }
+        }
+        return wrapper;
+    }
+}

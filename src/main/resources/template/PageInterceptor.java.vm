@@ -1,0 +1,77 @@
+package ${package}.${common}.config;
+
+import lombok.SneakyThrows;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
+import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * @author ${author}
+ * @Date ${date}
+ */
+
+@Configuration
+public class PageInterceptor implements Interceptor {
+
+    private int page;
+    private int size;
+    @SuppressWarnings("unused")
+    private String dbType;
+
+    @Override
+    @SneakyThrows(value = Exception.class)
+    public Object intercept(Invocation invocation) {
+        StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
+        MetaObject metaObject = SystemMetaObject.forObject(statementHandler);
+        while (metaObject.hasGetter("h")) {
+            Object object = metaObject.getValue("h");
+            metaObject = SystemMetaObject.forObject(object);
+        }
+        while (metaObject.hasGetter("target")) {
+            Object object = metaObject.getValue("target");
+            metaObject = SystemMetaObject.forObject(object);
+        }
+        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
+        String mapId = mappedStatement.getId();
+        if (mapId.matches(".+Page$")) {
+            ParameterHandler parameterHandler = (ParameterHandler) metaObject.getValue("delegate.parameterHandler");
+            Map<String, Object> params = (Map<String, Object>) parameterHandler.getParameterObject();
+            page = (int) params.get("page");
+            size = (int) params.get("size");
+            String sql = (String) metaObject.getValue("delegate.boundSql.sql");
+            sql += " limit " + (page - 1) * size + "," + size;
+            metaObject.setValue("delegate.boundSql.sql", sql);
+        }
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object o) {
+        return Plugin.wrap(o, this);
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        String limit = properties.getProperty("limit", "10");
+        String page = properties.getProperty("current", "1");
+        this.size = Integer.parseInt(limit);
+        this.page = Integer.parseInt(page);
+        this.dbType = properties.getProperty("dbType", "mysql");
+    }
+
+    @Bean
+    public PageInterceptor myPageInterceptor() {
+        return new PageInterceptor();
+    }
+
+}

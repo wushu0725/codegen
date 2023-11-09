@@ -1,0 +1,16 @@
+package ${package}.${backmodule}.mapper;
+
+import com.alibaba.fastjson.JSONObject;
+import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import ${package}.${backmodule}.entity.${className};
+
+/**
+ * mapper
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${className}Mapper extends BaseMapper<${className}> {
+
+}

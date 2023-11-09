@@ -1,0 +1,18 @@
+package ${package}.${common};
+
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * @author ${author}
+ * @Date ${date}
+ */
+
+@Data
+public class Page<T> {
+    private int page;
+    private int size;
+    private Long total;
+    private List<T> records;
+}

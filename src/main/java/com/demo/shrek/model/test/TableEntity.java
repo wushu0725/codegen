@@ -18,6 +18,16 @@ public class TableEntity {
     //类名(第一个字母小写)，如：sys_user => sysUser
     private String classname;
 
+    private String pathName;
+
+    public String getPathName() {
+        return pathName;
+    }
+
+    public void setPathName(String pathName) {
+        this.pathName = pathName;
+    }
+
     public String getTableName() {
         return tableName;
     }

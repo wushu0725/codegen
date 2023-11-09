@@ -1,4 +1,6 @@
-package ${package}.entity;
+package ${package}.${tableName}.entity;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;

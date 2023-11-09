@@ -1,13 +1,17 @@
-package ${package}.service.impl;
+package ${package}.${backmodule}.service.impl;
 
 
-import ${package}.dao.mysql.${className}Dao;
+import ${package}.${backmodule}.dao.${className}Dao;
 import com.alibaba.fastjson.JSONObject;
-import ${package}.service.${className}Service;
-import com.heeexy.example.util.CommonUtil;
+import ${package}.${backmodule}.service.${className}Service;
+import ${package}.${common}.Result;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * ${comments}
@@ -19,32 +23,47 @@ import org.springframework.stereotype.Service;
 @Service
 public class ${className}ServiceImpl implements ${className}Service {
 
-    @Autowired
+    @Resource
     private ${className}Dao ${classname}Dao;
 
     @Override
-    public JSONObject update(JSONObject jsonObject){
-        ${classname}Dao.update(jsonObject);
-        return CommonUtil.successJson();
+    public Result update(JSONObject jsonObject) {
+            ${classname}Dao.update(jsonObject);
+        return Result.ok();
     }
 
     @Override
-    public JSONObject insert(JSONObject jsonObject){
-        ${classname}Dao.insert(jsonObject);
-        return CommonUtil.successJson();
+    public Result insert(JSONObject jsonObject) {
+            ${classname}Dao.insert(jsonObject);
+        return Result.ok();
     }
 
     @Override
-    public JSONObject list(JSONObject jsonObject){
-        CommonUtil.fillPageParam(jsonObject);
-        int count = ${classname}Dao.count(jsonObject);
+    public Result page(JSONObject jsonObject) {
+        if(Objects.isNull(jsonObject)){
+            jsonObject = new JSONObject();
+            jsonObject.put("size",20);
+            jsonObject.put("currentPage",1);
+        }
         List<JSONObject> list = ${classname}Dao.listByPage(jsonObject);
-        return CommonUtil.successPage(jsonObject, list, count);
+        return Result.okData(list);
     }
 
     @Override
-    public JSONObject delete (Long id){
-        ${classname}Dao.delete(id);
-        return CommonUtil.successJson();
+    public Result count(JSONObject jsonObject) {
+        int count = ${classname}Dao.count(jsonObject);
+        return Result.okData(count);
+    }
+
+    @Override
+    public Result delete(Long id) {
+            ${classname}Dao.delete(id);
+        return Result.ok();
+    }
+
+    @Override
+    public Result get(Long id) {
+        JSONObject json = ${classname}Dao.getById(id);
+        return Result.okData(json);
     }
 }

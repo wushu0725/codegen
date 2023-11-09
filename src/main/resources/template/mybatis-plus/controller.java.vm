@@ -1,0 +1,66 @@
+package ${package}.${backmodule}.controller;
+
+import ${package}.${backmodule}.service.${className}Service;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import com.alibaba.fastjson.JSONObject;
+import ${package}.${common}.Result;
+import ${package}.${backmodule}.entity.${className};
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import ${package}.${common}.CommonPageService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import javax.annotation.Resource;
+import java.util.Objects;
+
+@RestController
+@RequestMapping("${secondModuleName}")
+public class ${className}Controller {
+
+    @Resource
+    private ${className}Service ${classname}Service;
+    @Resource
+    private CommonPageService<${className}> commonPageService;
+
+    @PostMapping("/save")
+    public Result insert(@RequestBody JSONObject requestJson) {
+        ${className} obj = JSONObject.parseObject(requestJson.toJSONString(),${className}.class);
+        ${classname}Service.saveOrUpdate(obj);
+        return Result.ok();
+    }
+
+    @PostMapping("/update")
+    public Result update(@RequestBody JSONObject requestJson) {
+        String pk = requestJson.getString("${pk.attrname}");
+        if(Objects.isNull(${classname}Service.getById(pk))){
+            return Result.failure(String.format("%s对象不存在","${classname}"));
+        }
+        ${className} obj = JSONObject.parseObject(requestJson.toJSONString(),${className}.class);
+        ${classname}Service.updateById(obj);
+        return Result.ok();
+    }
+
+    @PostMapping("/delete/{${pk.attrname}}")
+    public Result delete(@PathVariable(name = "${pk.attrname}") String id) {
+        ${classname}Service.removeById(${pk.attrType}.valueOf(id));
+        return Result.ok();
+    }
+
+    @PostMapping("/page")
+    public Result page(@RequestBody JSONObject requestJson) throws Exception{
+        IPage<${className}> page = new Page<>();
+        if (StringUtils.isNotEmpty(requestJson.getString("page"))) {
+            JSONObject obj = requestJson.getJSONObject("page");
+            page = new Page<>(obj.getLong("current"), obj.getLong("size"));
+        }
+        QueryWrapper<${className}> wrapper = commonPageService.initMbpWrapper(requestJson);
+        IPage<${className}> objs = ${classname}Service.page(page,wrapper);
+        return Result.okData(page);
+    }
+
+    @PostMapping("/get/{${pk.attrname}}")
+    public Result get(@PathVariable(name = "${pk.attrname}") String id) {
+        return Result.okData(${classname}Service.getById(${pk.attrType}.valueOf(id)));
+    }
+}

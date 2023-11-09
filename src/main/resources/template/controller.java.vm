@@ -1,45 +1,51 @@
-package ${package}.controller;
+package ${package}.${backmodule}.controller;
 
-import ${package}.service.${className}Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import com.alibaba.fastjson.JSONObject;
-
-
-import org.springframework.web.bind.annotation.RestController;
+import ${package}.${backmodule}.service.${className}Service;
+import ${package}.${common}.Result;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import com.heeexy.example.util.CommonUtil;
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.RestController;
+import javax.annotation.Resource;
+import java.util.*;
 
+/**
+ * <p>
+ * 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${datetime}
+ */
 @RestController
-@RequestMapping("${secondModuleName}")
+@RequestMapping("/${secondModuleName}/")
 public class ${className}Controller {
 
-    @Autowired
+    @Resource
     private ${className}Service ${classname}Service;
 
-    @PostMapping
-    public JSONObject insert(@RequestBody JSONObject requestJson) {
-        return ${classname}Service.insert(requestJson);
+    @PostMapping("/add")
+    public Result insert(@RequestBody JSONObject requestJson) {
+
+        return ${classname}Service.create(requestJson);
     }
 
-    @PutMapping
-    public JSONObject update(@RequestBody JSONObject requestJson) {
+    @PostMapping("/updateById")
+    public Result update(@RequestBody JSONObject requestJson) {
         return ${classname}Service.update(requestJson);
     }
 
-    @DeleteMapping
-    public JSONObject delete(HttpServletRequest request) {
-        return ${classname}Service.delete(Long.valueOf(request.getParameter("id")));
+    @PostMapping("/delById/{${id}}")
+    public Result delete(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.deleteById(Long.valueOf(id));
     }
 
-    @GetMapping
-    public JSONObject list(HttpServletRequest request) {
-        JSONObject jsonObject=CommonUtil.request2Json(request);
-        return ${classname}Service.list(jsonObject);
+    @PostMapping("/page")
+    public Result page(@RequestBody JSONObject requestJson) {
+        return ${classname}Service.page(requestJson);
     }
+
+    @PostMapping("/getById/{${id}}")
+    public Result get(@PathVariable(name = "${id}") String id) {
+        return ${classname}Service.selectById(Long.valueOf(id));
+    }
+
 }

@@ -1,7 +1,8 @@
-package ${package}.dao;
+package ${package}.${backmodule}.dao;
 
 import com.alibaba.fastjson.JSONObject;
-import com.heeexy.example.util.CommonUtil;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.List;
 /**
  * ${comments}
@@ -10,13 +11,15 @@ import java.util.List;
  * @email ${email}
  * @date ${datetime}
  */
-
+@Mapper
 public interface ${className}Dao {
     int update(JSONObject jsonObject);
 
     int insert(JSONObject jsonObject);
 
     List<JSONObject> listByPage(JSONObject jsonObject);
+
+    JSONObject getById(Long id);
 
     int delete (Long id);
 
